@@ -1,10 +1,7 @@
 package com.devsuperior.hrpayroll.resources;
 
-import javax.websocket.server.PathParam;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,16 +9,29 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.devsuperior.hrpayroll.entities.Payment;
 import com.devsuperior.hrpayroll.services.PaymentService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 @RestController
 @RequestMapping(value = "/payments")
 public class PaymentResources {
+
     @Autowired
     private PaymentService service;
 
+    @HystrixCommand(fallbackMethod = "getPaymentAlternative")
     @GetMapping(value = "/{workerId}/days/{days}")
     public ResponseEntity<Payment> getPayment(@PathVariable Long workerId, @PathVariable Integer days){
         Payment payment = service.getPayment(workerId, days);
         return ResponseEntity.ok(payment);
     }
+
+    public ResponseEntity<Payment> getPaymentAlternative(Long workerId, Integer days){
+        // HystrixCommand serve para lidar com problemas internos de miucro servico
+        // possa ser que o micro servico que o metodo getPayment usa estaja fora do ar ou com algum problema
+        // para evitar esses tipos de problemas que poderia quebrar a aplicacao e passado essa anotation @HystrixCommand(fallbackMethod = "getPaymentAlternative")
+        // caso o metodo chamado tenha algum problema ele chama o metodo alterativo(ou caminho alternativo)
+        Payment payment = new Payment("Brand",400.0,days);
+        return ResponseEntity.ok(payment);
+    }
+
 }
