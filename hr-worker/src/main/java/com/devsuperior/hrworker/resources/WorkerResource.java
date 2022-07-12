@@ -25,23 +25,23 @@ import com.devsuperior.hrworker.repositories.WorkerRepository;;
 public class WorkerResource {
 
     private static Logger Logger = LoggerFactory.getLogger(WorkerResource.class);
-
-    @Value("${test.config}")
+/*
+    @Value("${hr-worker.properties}")
     private String testConfig;
-
+ */
     @Autowired
     private Environment env;
 
     @Autowired
     private WorkerRepository repository;
-
+    /*
     @GetMapping(value = "/configs")
     public ResponseEntity<Void> getConfig(){
         Logger.info("-------->CONFIG : "+testConfig);
 
         return ResponseEntity.noContent().build();
     }
-
+    */
     @GetMapping
     public ResponseEntity<List<Worker>> findAll(){
         List<Worker> list = repository.findAll();
